@@ -1,8 +1,13 @@
 #40917=漢字最後 
 
-#　エラー処理
-# アルファベットは正常に動作するが、40917にすると異なる値が出てきてしまう、数値の設定が良くない可能性？
+#　エラー処理 tryとかexpect
 
+# アルファベットは正常に動作するが、40917にすると異なる値が出てきてしまう、数値の設定が良くない可能性？
+#40917モードで数字にすると小さい値、『、ab、あ、などは成功。abc、ああ、は失敗。計算上うまくいっていない部分があるかも？
+#ハッシュソートが使えないパターンみたいに、被りが生じてしまう？
+#->後日立証。n=120223x133039、e=140909で失敗する、ああ、で成功。abc失敗
+#  -<のような入力不能な文字のせいで暗号化復号化で数値がずれる可能性？？
+#-> n=725603x726853、e=729041、でabc成功。単純に数を増やせば正常に動く範囲が広くなるとほぼ確定した !!!!!
 import sympy
 
 def main():
@@ -10,13 +15,13 @@ def main():
     n=40917# 文字の種類の数、アルファベットは26,Unicord 漢字表記をすべて入れるため40917。
     if switch==11 or switch==22:
         n=26#アルファベット用
-    print('nnnnn',n)
+    print('N=',n)
     if switch ==1 or switch ==11:
         p1=str(input('暗号化 (署名検証) する文章を入力\n->'))
         mod=int(input('公開鍵 mod (n) を入力、'))#モジュロ演算に用いる数
         e=int(input('公開鍵 e を入力'))#互いに素である二つの数の積
         P=setting(n,switch,p1,mod,e)
-        print('PP===',P)
+        print(' ( 署名値== )',P)
         CP=crypt(P,n,switch)
         strCP="".join(CP)
         print('暗号化済みの文 \n',strCP)
@@ -25,13 +30,11 @@ def main():
         p=int(input('q='))
         q=int(input('q='))
         mod=p*q
-        L = sympy.lcm(p-1,q-1)
-        e = int(input('公開鍵 e を入力'))#  65537
+        L=sympy.lcm(p-1,q-1)
+        e=int(input('公開鍵 e を入力'))#  65537
         d,y,z=sympy.gcdex(e,L)
         d=d%L #dを最小生剰余に
-        print(type(d))
         d=int(d)
-        print(type(d),d)
         powed=setting(n, switch,p1,mod,d)#e->d
         post=crypt(powed,n,switch)
         strP="".join(post)
@@ -48,7 +51,7 @@ def setting(n: int, switch: int,p1: str,mod: int,e:int ) -> int :
     for i in p1:
         ins=ord(i)
         if switch==11 or switch==22:
-            ins=ins-97#a==0
+            ins=ins-97#a->0
         plen=len(p1)-ii
         ii+=1
         ins=ins*(n**plen)
@@ -82,23 +85,7 @@ def fact():
                 print("n={}".format(n)) # nの更新状況をみてみる
             else:
                 break
-"""
 
-def setting():
-    P0=str(input('暗号化する「小文字のアルファベットの」文章を入力\n->'))
-    p_l=len(P0)
-    P1=([])
-    print(p_l,type(P0))
-    for p in P0:
-        ins1=P0[p]
-        ins2=ord(ins1)
-        P1.append(ins2)
-
-"""
-
-def reading():
-    print('a')
-    
 
 if __name__ == '__main__':
     main()
